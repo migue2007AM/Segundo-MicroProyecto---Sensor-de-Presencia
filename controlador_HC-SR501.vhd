@@ -97,6 +97,22 @@ begin
 		 end case;
    end process;
 	
+	process(clk, reset)
+	begin
+		if reset = '0' then
+			led_reg <= '0';
+		elsif rising_edge(clk) then
+			if state = READ_SENSOR then
+				led_reg <= sensor_in;
+			else 
+				led_reg <= led_reg;
+			end if;
+	   end if;
+	end process;
+	
+	led_out <= led_reg;
+	
+end architecture;
 	
 
 
