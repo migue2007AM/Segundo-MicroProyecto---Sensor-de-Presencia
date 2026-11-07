@@ -3,7 +3,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
-ENTITY pir_controler is
+ENTITY controlador_HCSR501 is
 	port(clk : in STD_LOGIC;
 		  reset : in STD_LOGIC;
 		  pin_GPI0 : in STD_LOGIC;
@@ -14,7 +14,7 @@ ENTITY pir_controler is
 
 END ENTITY;
 
-ARCHITECTURE presencia of pir_controler is
+ARCHITECTURE rtl of controlador_HCSR501 is
 
 	constant F_CLK_HZ : integer := 50000000;
 	constant FRECUENCIA_SENSOR : integer := 10;
@@ -40,8 +40,8 @@ ARCHITECTURE presencia of pir_controler is
   signal tick_i    : std_logic := '0';                   -- Señal interna de tick
   signal cnt_max   : integer := CNT_MAX_SLOW;            -- Selección dinámica del límite
   
-  type estados is (IDLE, READ_SENSOR, WAIT);
-  signal state, state_next;
+  type estados is (IDLE, READ_SENSOR, WAIT_ST);
+  signal state, state_next : estados := IDLE;
   
   signal led_reg : STD_LOGIC := '0';
   signal tick : STD_LOGIC;
@@ -64,7 +64,7 @@ begin
 		end if;
 	end process;
 	
-	tick <= tick_1
+	tick <= tick_i;
 	
 	process(clk, reset)
 	begin
@@ -75,7 +75,7 @@ begin
 		end if;
 	end process;
 	
-	process (state, tick)
+	process(state, tick)
 	begin
 	state_next <= state;
 	
@@ -87,9 +87,9 @@ begin
 				end if;
 				
 			when READ_SENSOR =>
-				state_next <= WAIT;
+				state_next <= WAIT_ST;
 				
-			when WAIT =>
+			when WAIT_ST =>
 				state_next <= IDLE;
 				
 			when others =>
@@ -103,7 +103,7 @@ begin
 			led_reg <= '0';
 		elsif rising_edge(clk) then
 			if state = READ_SENSOR then
-				led_reg <= sensor_in;
+				led_reg <= pin_GPI0;
 			else 
 				led_reg <= led_reg;
 			end if;
@@ -111,6 +111,7 @@ begin
 	end process;
 	
 	led_out <= led_reg;
+	presencia <= led_reg;
 	
 end architecture;
 	
