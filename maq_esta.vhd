@@ -10,7 +10,7 @@ entity maq_esta is
         proceso_fin : in  STD_LOGIC; 
         rom_en            : out STD_LOGIC;
         ram_en            : out STD_LOGIC; 
-        señal_logica      : out STD_LOGIC   
+        señal			     : out STD_LOGIC   
     );
 end maq_esta;
 
@@ -36,7 +36,7 @@ architecture contro of maq_esta is
 	next_state <= current_state;
    rom_en     <= '0';
    ram_en     <= '0';
-   señal_logica   <= '0';
+   señal		  <= '0';
 	
 	case current_state is
 	-- ESTADO 0: Espera de presencia del sensor
@@ -51,7 +51,28 @@ architecture contro of maq_esta is
 	
 	when ST_PROCESO =>
 	
+		rom_en <= '1';
+      ram_en <= '1';
 
+		if (proceso_fin = '1') and (pir_in = '0') then
+			señal <='1';
+			next_state <= ST_ESPERA;
+		
+		elsif (proceso_fin = '1') and (pir_in= '1') then 
+			señal <= '1';
+			next_state <= ST_PROCESO;
+		
+		else 
+			next_state <= ST_PROCESO;
+		end if;
+		
+		when others => 
+		next_state <= ST_ESPERA;
+	
+	end case;
+end process;
+
+	
 			
 			
 	
