@@ -10,6 +10,7 @@ ENTITY top_level_sensor is
 		reset : in STD_LOGIC;
 		pin_GPIO : IN STD_LOGIC;
 		
+		led_sensor: out STD_LOGIC;
 		bcd_7seg1 : out STD_LOGIC_VECTOR(6 downto 0);
 		bcd_7seg2 : out STD_LOGIC_VECTOR(6 downto 0);
 		bcd_7seg3 : out STD_LOGIC_VECTOR(6 downto 0);
@@ -18,8 +19,62 @@ ENTITY top_level_sensor is
 		
 architecture logica of top_level_sensor is
 
-	SIGNAL cable_pir_event    : STD_LOGIC        // Transporta el pulso de 1 ciclo del sensor a la FSM
-   SIGNAL cable_bandera_fsm  : STD_LOGIC        // Transporta la orden de escritura (Enable) de la FSM a la RAM
-   SIGNAL cable_bus_rom      : BUS_DATOS  // Transporta el código hexadecimal desde la ROM a la RAM
-   SIGNAL cable_bus_ram      : BUS_DATOS  // Transporta el código guardado desde la RAM al display
-   SIGNAL cable_direccion    : BUS_DIR    // Transporta el puntero actual de la RAM hacia la ROM
+	signal cable_presencia : STD_LOGIC;
+	signal cable_bandera_fsm : STD_LOGIC;
+	signal cable_bus_rom : STD_LOGIC_VECTOR(DATA_WIDTH - 1 downto 0);
+	signal cable_bus_ram : STD_LOGIC_VECTOR(DATA_WIDTH - 1 downto 0);
+	signal cable_direccion : STD_LOGIC_VECTOR(ADDR_WIDTH - 1 downto 0);
+
+begin 
+
+		U1_CONTROLADOR_PIR : controlador_HCSR501
+			port map(
+				clk => clk,
+				reset => reset
+				pin_GPIO => pin_GPIO
+				led_out => led_sensor
+				presencia => cable_presencia
+			);
+			
+		U2_UNIDAD_DE_CONTROL_FSM : maq_esta
+			port map(
+				 clk => clk
+				 rst => reset
+				 pir_in => cable_presencia
+				 proceso_fin => cable_bandera_fsm
+				 rom_en => cable_bus_rom
+				 ram_en => cable_bus_ram
+				 senal => )
+				 
+		U3_MEMORIA_ROM : rom_sync
+			generic map(
+					DATA_WIDTH => 8,
+					ADDR_WIDTH => 4
+					)
+					
+			port map(
+					clk => clk,
+					addr => cable_direccion,
+					data_out => cable_bus_rom
+					);
+					
+		U4_MEMORIA_RAM : ram_sincrona
+			generic map(
+					DATA_WIDTH => 8,
+					ADDR_WIDTH => 4,
+					RDW_MODE => "READ_FIRST"
+					)
+					
+			PORT MAP(
+					clk => clk,
+					rd_en => reset
+					wr_en => cable_bandera_fsm
+					addr => cable_direccion
+					data_in => cable_bus_rom
+					data_out => cable_bus_ram
+					);
+					
+		U5_DECODIFICADOR_DISPLAY : BCD_7seg1
+			PORT MAP(
+					)
+			
