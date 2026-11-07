@@ -60,4 +60,23 @@ package package_sensor is
 			
 		END COMPONENT;
 		
+	 COMPONENT controlador_HCSR501 IS
+		 PORT(
+			clk : in STD_LOGIC;
+			reset : in STD_LOGIC;
+			pin_GPI0 : in STD_LOGIC;
+		  
+			led_out : out STD_LOGIC;
+			presencia : out STD_LOGIC);
+			
+		END COMPONENT;
+		
+		COMPONENT display_decoder IS
+			PORT(
+				dato_ram : in STD_LOGIC_VECTOR(3 downto 0)
+				hex_out : out STD_LOGIC_VECTOR(6 downto 0)
+				);
+				
+		END COMPONENT;
+		
 END package_sensor;
