@@ -65,4 +65,40 @@ begin
 	end process;
 	
 	tick <= tick_1
+	
+	process(clk, reset)
+	begin
+		if reset = '0' then
+			state <= IDLE;
+		elsif rising_edge(clk) then
+			state <= state_next;
+		end if;
+	end process;
+	
+	process (state, tick)
+	begin
+	state_next <= state;
+	
+		case state is
+			when IDLE =>
+			
+				if tick = '1' then
+					state_next <= READ_SENSOR;
+				end if;
+				
+			when READ_SENSOR =>
+				state_next <= WAIT;
+				
+			when WAIT =>
+				state_next <= IDLE;
+				
+			when others =>
+				state_next <= IDLE;
+		 end case;
+   end process;
+	
+	
+
+
+	
   
