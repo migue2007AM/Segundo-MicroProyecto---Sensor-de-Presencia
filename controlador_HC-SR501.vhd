@@ -1,0 +1,45 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+ENTITY pir_controler is
+	port(clk : in STD_LOGIC;
+		  reset : in STD_LOGIC;
+		  pin_GPI0 : in STD_LOGIC;
+		  
+		  led_out : out STD_LOGIC;
+		  presencia : out STD_LOGIC
+		  );
+
+END ENTITY;
+
+ARCHITECTURE presencia of pir_controler is
+
+	constant F_CLK_HZ : integer := 50000000;
+	constant FRECUENCIA_SENSOR : integer := 10;
+	
+   function cycles_for(freq_hz : integer) return integer is
+    variable c : integer;
+	  begin
+		 if freq_hz < 1 then
+			c := 1;                                        -- Evita división por cero
+		 else
+			c := F_CLK_HZ / freq_hz;                       -- Número de ciclos por periodo
+			if c < 1 then
+			  c := 1;                                      -- Piso mínimo
+			end if;
+		 end if;
+		 return c;
+  end function;
+  
+  constant CNT_MAX_SLOW : integer := cycles_for(FRECUENCIA_SENSOR); -- Cuenta para modo lento
+  constant CNT_MAX_FAST : integer := cycles_for(F_CLK_HZ); -- Cuenta para modo rápido
+  
+  signal cnt       : integer range 0 to integer'high;   -- Contador de ciclos
+  signal tick_i    : std_logic := '0';                   -- Señal interna de tick
+  signal cnt_max   : integer := CNT_MAX_SLOW;            -- Selección dinámica del límite
+  
+  type estados is (IDLE, READ_SENSOR, WAIT);
+  signal state, state_next;
+  
