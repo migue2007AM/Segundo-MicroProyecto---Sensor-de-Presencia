@@ -38,4 +38,21 @@ architecture contro of maq_esta is
    ram_en     <= '0';
    señal_logica   <= '0';
 	
+	case current_state is
+	-- ESTADO 0: Espera de presencia del sensor
+	when ST_ESPERA => 
+		if pir_in = '1' then 
+			next_state <= ST_PROCESO;
+		else 
+			next_state <= ST_ESPERA;
+		end if;
+		
+	-- ESTADO 1: Bucle de ejecución coordinando las memorias externas
+	
+	when ST_PROCESO =>
+	
+
+			
+			
+	
 	
