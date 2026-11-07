@@ -31,5 +31,7 @@ begin
 					  "0001110" when x"F",
 					  "1111111" when others;
 					  
+hex_out <= "1111111" when (apagar_display = '1') else segmentos_temp;
+					  
 end architecture;
 	
