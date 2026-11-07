@@ -43,3 +43,26 @@ ARCHITECTURE presencia of pir_controler is
   type estados is (IDLE, READ_SENSOR, WAIT);
   signal state, state_next;
   
+  signal led_reg : STD_LOGIC := '0';
+  signal tick : STD_LOGIC;
+  
+begin
+
+	process(clk,reset)
+	begin
+		if reset = '0' then
+			cnt <= 0;
+			tick_i <= '0';
+		elsif rising_edge(clk) then
+			if cnt = (CNT_MAX_SLOW - 1) then
+				cnt <= 0;
+				tick_i <= '1';
+			else
+				cnt <= cnt + 1;
+				tick_i <= '0';
+			end if;
+		end if;
+	end process;
+	
+	tick <= tick_1
+  
