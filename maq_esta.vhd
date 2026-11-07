@@ -14,3 +14,10 @@ entity maq_esta is
     );
 end maq_esta;
 
+architecture contro of maq_esta is
+
+    type state_type is (ST_ESPERA, ST_PROCESO);
+    signal current_state, next_state : state_type;
+	 
+	begin
+
