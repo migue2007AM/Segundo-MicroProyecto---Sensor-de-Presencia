@@ -17,7 +17,8 @@ ENTITY top_level_sensor is
 		hex_7seg3 : out STD_LOGIC_VECTOR(6 downto 0);
 		hex_7seg4 : out STD_LOGIC_VECTOR(6 downto 0)
 		);
-		
+end entity;
+
 architecture logica of top_level_sensor is
 
 	signal cable_presencia : STD_LOGIC;
@@ -38,27 +39,27 @@ begin
 						FOUT => 1
 						)
 			PORT MAP(
-					clk_in => clk
-					reset => reset
+					clk_in => clk,
+					reset => reset,
 					clk_out => tick_1s_sig
 					);
 
 		U1_CONTROLADOR_PIR : controlador_HCSR501
 			port map(
 				clk => clk,
-				reset => reset
-				pin_GPIO => pin_GPIO
+				reset => reset,
+				pin_GPIO => pin_GPIO,
 				presencia => cable_presencia
 			);
 			
 		U2_UNIDAD_DE_CONTROL_FSM : maq_esta
 			port map(
-				 clk => clk
-				 rst => reset
-				 pir_in => cable_presencia
+				 clk => clk,
+				 rst => reset,
+				 pir_in => cable_presencia,
 				 proceso_fin => cable_proceso_fin,
-				 rom_en => open
-				 ram_en => cable_bandera_fsm
+				 rom_en => open,
+				 ram_en => cable_bandera_fsm,
 				 senal => cable_senal,
 				 tick_1s => tick_1s_sig,
 				 rom_addr => cable_direccion
@@ -66,7 +67,7 @@ begin
 				 
 		U3_MEMORIA_ROM : rom_sync
 			generic map(
-					DATA_WIDTH => 8,
+					DATA_WIDTH => 16,
 					ADDR_WIDTH => 4
 					)
 					
@@ -78,7 +79,7 @@ begin
 					
 		U4_MEMORIA_RAM : ram_sincrona
 			generic map(
-					DATA_WIDTH => 8,
+					DATA_WIDTH => 16,
 					ADDR_WIDTH => 4,
 					RDW_MODE => "READ_FIRST"
 					)
@@ -92,8 +93,6 @@ begin
 					data_out => cable_bus_ram
 					);
 					
-		 
-					
 		process(clk)
 		begin
 			if rising_edge(clk) then
@@ -102,9 +101,9 @@ begin
 		end process;
 		cable_proceso_fin <= retardo_escritura(1);
 					
-		process(mostrar_disp, cable_bus_ram)
+		process(cable_bandera_fsm, cable_bus_ram)
 			begin
-				if mostrar_disp = '1' then
+				if cable_bandera_fsm = '1' then
 					hex_7seg1 <= hex_7seg(cable_bus_ram(3 downto 0));
 					hex_7seg2 <= hex_7seg(cable_bus_ram(7 downto 4));
 					hex_7seg3 <= hex_7seg(cable_bus_ram(11 downto 8));
@@ -116,6 +115,6 @@ begin
 					hex_7seg4 <= "1111111";
 				end if;
 		end process;
-		
-		led_clk <= 
-end architecture;
+		led_sensor <= cable_presencia;
+		led_clk <= tick_1s_sig;
+end logica;
