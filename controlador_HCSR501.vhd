@@ -6,7 +6,7 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 ENTITY controlador_HCSR501 is
 	port(clk : in STD_LOGIC;
 		  reset : in STD_LOGIC;
-		  pin_GPI0 : in STD_LOGIC;
+		  pin_GPIO : in STD_LOGIC;
 		  
 --		  led_out : out STD_LOGIC;
 		  presencia : out STD_LOGIC
@@ -140,7 +140,7 @@ begin
 		case state is
 			when IDLE =>
 			
-				if tick = '1' and pin_GPI0 = '1' then
+				if tick = '1' and pin_GPIO = '1' then
 					state_next <= READ_SENSOR;
 				end if;
 				
@@ -149,7 +149,7 @@ begin
 				
 			when WAIT_ST =>
 				
-				if pin_GPI0 = '0' then
+				if pin_GPIO = '0' then
 					state_next <= IDLE;
 				end if;
 			when others =>
@@ -163,7 +163,7 @@ begin
 			led_reg <= '0';
 		elsif rising_edge(clk) then
 			if state = READ_SENSOR then
-				led_reg <= pin_GPI0;
+				led_reg <= pin_GPIO;
 			else 
 				led_reg <= led_reg;
 			end if;
