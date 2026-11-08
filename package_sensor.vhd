@@ -4,11 +4,14 @@ USE IEEE.STD_LOGIC_ARITH.ALL;
 USE IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 package package_sensor is
+	constant DATA_WIDTH : positive := 16;
+	constant ADDR_WIDTH : positive := 4;
+	
 	function hex_7seg(hex : STD_LOGIC_VECTOR(3 downto 0)) return STD_LOGIC_VECTOR;
 	
 	COMPONENT rom_sync IS
 		GENERIC (
-		 DATA_WIDTH : positive := 8;
+		 DATA_WIDTH : positive := 16;
 		 ADDR_WIDTH : positive := 4
 		);
 		  PORT (
@@ -20,10 +23,19 @@ package package_sensor is
 	END COMPONENT;
 	
 	COMPONENT ram_sincrona IS
+		GENERIC(
+			DATA_WIDTH : positive := 16;
+			 ADDR_WIDTH : positive := 4;
+			 RDW_MODE   : string   := "READ_FIRST"  -- "READ_FIRST" | "WRITE_FIRST" | "NO_CHANGE"
+			 );
+		
 		PORT(
-			DATA_WIDTH : positive := 8;
-			ADDR_WIDTH : positive := 4;
-			RDW_MODE   : string   := "READ_FIRST"
+			clk      : in  std_logic;
+			 rd_en    : in  std_logic := '1';
+			 wr_en    : in  std_logic;
+			 addr     : in  std_logic_vector(ADDR_WIDTH-1 downto 0);
+			 data_in  : in  std_logic_vector(DATA_WIDTH-1 downto 0);
+			 data_out : out std_logic_vector(DATA_WIDTH-1 downto 0)
 		);
 	END COMPONENT;
 
@@ -45,7 +57,7 @@ package package_sensor is
 		GENERIC(
 			FININ : INTEGER := 50000000; 		-- Frecuencia del oscilador de la FPGA (50 MHz)
 			FOUT  : INTEGER := 1         		-- Frecuencia deseada para el conteo (1 Hz)
-			)
+			);
 			
 		PORT(
 			clk_in  : IN STD_LOGIC;      		-- Entra el reloj rápido de 50 MHz de la FPGA
@@ -59,19 +71,11 @@ package package_sensor is
 		 PORT(
 			clk : in STD_LOGIC;
 			reset : in STD_LOGIC;
-			pin_GPI0 : in STD_LOGIC;
+			pin_GPIO : in STD_LOGIC;
 		  
-			led_out : out STD_LOGIC;
+--			led_out : out STD_LOGIC;
 			presencia : out STD_LOGIC);
 			
-		END COMPONENT;
-		
-		COMPONENT display_decoder IS
-			PORT(
-				dato_ram : in STD_LOGIC_VECTOR(3 downto 0)
-				hex_out : out STD_LOGIC_VECTOR(6 downto 0)
-				);
-				
 		END COMPONENT;
 		
 END package_sensor;
