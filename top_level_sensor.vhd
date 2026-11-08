@@ -11,10 +11,10 @@ ENTITY top_level_sensor is
 		pin_GPIO : IN STD_LOGIC;
 		
 		led_sensor: out STD_LOGIC;
-		bcd_7seg1 : out STD_LOGIC_VECTOR(6 downto 0);
-		bcd_7seg2 : out STD_LOGIC_VECTOR(6 downto 0);
-		bcd_7seg3 : out STD_LOGIC_VECTOR(6 downto 0);
-		bcd_7seg4 : out STD_LOGIC_VECTOR(6 downto 0)
+		hex_7seg1 : out STD_LOGIC_VECTOR(6 downto 0);
+		hex_7seg2 : out STD_LOGIC_VECTOR(6 downto 0);
+		hex_7seg3 : out STD_LOGIC_VECTOR(6 downto 0);
+		hex_7seg4 : out STD_LOGIC_VECTOR(6 downto 0)
 		);
 		
 architecture logica of top_level_sensor is
@@ -67,14 +67,19 @@ begin
 					
 			PORT MAP(
 					clk => clk,
-					rd_en => reset
-					wr_en => cable_bandera_fsm
-					addr => cable_direccion
-					data_in => cable_bus_rom
+					rd_en => reset,
+					wr_en => cable_bandera_fsm,
+					addr => cable_direccion,
+					data_in => cable_bus_rom,
 					data_out => cable_bus_ram
 					);
 					
-		U5_DECODIFICADOR_DISPLAY : BCD_7seg1
+		U5_DECODIFICADOR_DISPLAY : HEX_7seg1
+			PORT MAP(
+					dato_ram => cable_bus_ram,
+					hex_out => bcd_7seg1
+					);
+		
+		U6_DECODIFICADOR_DISPLAY : HEX_7seg2
 			PORT MAP(
 					)
-			
