@@ -10,6 +10,7 @@ ENTITY top_level_sensor is
 		reset : in STD_LOGIC;
 		pin_GPIO : IN STD_LOGIC;
 		
+		led_clk   : out STD_LOGIC;
 		led_sensor: out STD_LOGIC;
 		hex_7seg1 : out STD_LOGIC_VECTOR(6 downto 0);
 		hex_7seg2 : out STD_LOGIC_VECTOR(6 downto 0);
@@ -31,6 +32,17 @@ architecture logica of top_level_sensor is
 
 begin 
 
+		U5_DIVISOR_FRECUENCIA : divisor_frecuencia
+			generic map(
+						FININ => 50000000,
+						FOUT => 1
+						)
+			PORT MAP(
+					clk_in => clk
+					reset => reset
+					clk_out => tick_1s_sig
+					);
+
 		U1_CONTROLADOR_PIR : controlador_HCSR501
 			port map(
 				clk => clk,
@@ -49,7 +61,8 @@ begin
 				 ram_en => cable_bandera_fsm
 				 senal => cable_senal,
 				 tick_1s => tick_1s_sig,
-				 rom_addr => cable_direccion)
+				 rom_addr => cable_direccion
+				 );
 				 
 		U3_MEMORIA_ROM : rom_sync
 			generic map(
@@ -79,6 +92,8 @@ begin
 					data_out => cable_bus_ram
 					);
 					
+		 
+					
 		process(clk)
 		begin
 			if rising_edge(clk) then
@@ -101,4 +116,6 @@ begin
 					hex_7seg4 <= "1111111";
 				end if;
 		end process;
+		
+		led_clk <= 
 end architecture;
