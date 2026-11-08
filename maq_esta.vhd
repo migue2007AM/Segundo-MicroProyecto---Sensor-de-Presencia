@@ -20,8 +20,24 @@ architecture contro of maq_esta is
 
    type state_type is (ST_ESPERA, ST_PROCESO);
    signal current_state, next_state : state_type;
+	
+	-- Señales internas para el generador aleatorio (LFSR)
+   signal registro_lfsr : std_logic_vector(7 downto 0) := "10101011";
+   signal bit_retroceso : std_logic;
+   signal indice_rom    : integer range 0 to 5 := 0;
 	 
 	begin
+	 -- 1. Lógica del LFSR (Corre constantemente a toda velocidad con el reloj de la FPGA)
+	bit_retroceso <= registro_lfsr(7) xor registro_lfsr(5) xor registro_lfsr(4) xor registro_lfsr(3);
+
+		 process(clk, rst)
+    begin
+        if rst = '1' then
+            registro_lfsr <= "10101011";
+        elsif rising_edge(clk) then
+            registro_lfsr <= registro_lfsr(6 downto 0) & bit_retroceso;
+        end if;
+    end process;
 
 		 process(clk, rst)
 		 begin
@@ -31,6 +47,22 @@ architecture contro of maq_esta is
 					current_state <= next_state;
 			  end if;
 		 end process;
+		 
+		process(clk, rst)
+		begin
+        if rst = '1' then
+            indice_rom <= 0;
+        elsif rising_edge(clk) then
+            if current_state = ST_PROCESO and tick_1s = '1' then
+                -- Limita el valor aleatorio estrictamente entre 0 y 5 (mensajes de tu ROM)
+                indice_rom <= to_integer(unsigned(registro_lfsr)) mod 6;
+            elsif current_state = ST_ESPERA then
+                indice_rom <= 0; -- Se reinicia al esperar
+            end if;
+        end if;
+    end process;
+    
+    rom_addr <= std_logic_vector(to_unsigned(indice_rom, 4));
 	
 	process (current_state, pir_in, proceso_fin)
 	begin
