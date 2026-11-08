@@ -7,10 +7,12 @@ entity maq_esta is
         clk               : in  STD_LOGIC;
         rst               : in  STD_LOGIC;
         pir_in            : in  STD_LOGIC; -- '1' hay presencia, '0' no hay
-        proceso_fin 		  : in  STD_LOGIC; -- senal que indica si el bloque externo terminó
+        proceso_fin 		  : in  STD_LOGIC; -- senal que indica si el bloque externo terminÃ³
         rom_en            : out STD_LOGIC; -- Habilitador de lectura para ROM
         ram_en            : out STD_LOGIC; -- Habilitador de escritura para RAM 
-        senal			     : out STD_LOGIC  -- Aviso que la máquina de estados envía
+        senal			     : out STD_LOGIC;  -- Aviso que la mÃ¡quina de estados envÃ­a
+		  tick_1s           : in  STD_LOGIC;
+		  rom_addr          : out STD_LOGIC_VECTOR(3 downto 0) --DirecciÃ³n aleatoria para la ROM (0 a 5)
     );
 end maq_esta;
 
@@ -18,8 +20,24 @@ architecture contro of maq_esta is
 
    type state_type is (ST_ESPERA, ST_PROCESO);
    signal current_state, next_state : state_type;
+	
+	-- SeÃ±ales internas para el generador aleatorio (LFSR)
+   signal registro_lfsr : std_logic_vector(7 downto 0) := "10101011";
+   signal bit_retroceso : std_logic;
+   signal indice_rom    : integer range 0 to 5 := 0;
 	 
 	begin
+	 -- 1. LÃ³gica del LFSR (Corre constantemente a toda velocidad con el reloj de la FPGA)
+	bit_retroceso <= registro_lfsr(7) xor registro_lfsr(5) xor registro_lfsr(4) xor registro_lfsr(3);
+
+		 process(clk, rst)
+    begin
+        if rst = '1' then
+            registro_lfsr <= "10101011";
+        elsif rising_edge(clk) then
+            registro_lfsr <= registro_lfsr(6 downto 0) & bit_retroceso;
+        end if;
+    end process;
 
 		 process(clk, rst)
 		 begin
@@ -29,6 +47,22 @@ architecture contro of maq_esta is
 					current_state <= next_state;
 			  end if;
 		 end process;
+		 
+		process(clk, rst)
+		begin
+        if rst = '1' then
+            indice_rom <= 0;
+        elsif rising_edge(clk) then
+            if current_state = ST_PROCESO and tick_1s = '1' then
+                -- Limita el valor aleatorio estrictamente entre 0 y 5 (mensajes de tu ROM)
+                indice_rom <= to_integer(unsigned(registro_lfsr)) mod 6;
+            elsif current_state = ST_ESPERA then
+                indice_rom <= 0; -- Se reinicia al esperar
+            end if;
+        end if;
+    end process;
+    
+    rom_addr <= std_logic_vector(to_unsigned(indice_rom, 4));
 	
 	process (current_state, pir_in, proceso_fin)
 	begin
@@ -47,7 +81,7 @@ architecture contro of maq_esta is
 				next_state <= ST_ESPERA;
 			end if;
 		
-	-- ESTADO 1: Bucle de ejecución coordinando las memorias externas
+	-- ESTADO 1: Bucle de ejecuciÃ³n coordinando las memorias externas
 	
 		when ST_PROCESO =>
 			rom_en <= '1';
@@ -71,10 +105,5 @@ architecture contro of maq_esta is
 		end case;
 	end process;
 
-end architecture;
-
-	
-			
-			
-	
+end architecture;	
 	
