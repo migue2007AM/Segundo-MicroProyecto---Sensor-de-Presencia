@@ -26,24 +26,18 @@ package package_sensor is
 			RDW_MODE   : string   := "READ_FIRST"
 		);
 	END COMPONENT;
-	
-	COMPONENT BCD_7SEG IS
-		PORT(
-			A: in STD_LOGIC_VECTOR(3 downto 0);       -- La entrada de 4 bits que el codigo convertira a 7 B para poder plasmarlo en el display
-			B: out STD_LOGIC_VECTOR(6 downto 0)
-		  );
-		 
-	END COMPONENT;
 
 	COMPONENT maq_esta IS
 		PORT(
 			clk               : in  STD_LOGIC;
 			rst               : in  STD_LOGIC;
 			pir_in            : in  STD_LOGIC; -- '1' hay presencia, '0' no hay
-			proceso_fin 		  : in  STD_LOGIC; -- senal que indica si el bloque externo terminó
+			proceso_fin 		  : in  STD_LOGIC; -- senal que indica si el bloque externo terminÃ³
 			rom_en            : out STD_LOGIC; -- Habilitador de lectura para ROM
 			ram_en            : out STD_LOGIC; -- Habilitador de escritura para RAM 
-			senal			     : out STD_LOGIC  -- Aviso que la máquina de estados envía
+			senal			     : out STD_LOGIC;  -- Aviso que la mÃ¡quina de estados envÃ­a
+			tick_1s           : in  STD_LOGIC;
+			rom_addr          : out STD_LOGIC_VECTOR(3 downto 0) --DirecciÃ³n aleatoria para la ROM (0 a 5)
 			);
 	 END COMPONENT;
 	 
