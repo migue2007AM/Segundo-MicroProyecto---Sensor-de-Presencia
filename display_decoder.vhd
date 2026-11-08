@@ -5,6 +5,7 @@ use work.pkg_system.all;
 entity display_decoder is
 	port(
 		dato_ram : in STD_LOGIC_VECTOR(3 downto 0)
+		apagar_display : in STD_LOGIC;
 		hex_out : out STD_LOGIC_VECTOR(6 downto 0)
 		);
 end entity;
