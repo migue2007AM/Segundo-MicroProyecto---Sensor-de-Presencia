@@ -24,6 +24,7 @@ architecture logica of top_level_sensor is
 	signal cable_bus_rom : STD_LOGIC_VECTOR(DATA_WIDTH - 1 downto 0);
 	signal cable_bus_ram : STD_LOGIC_VECTOR(DATA_WIDTH - 1 downto 0);
 	signal cable_direccion : STD_LOGIC_VECTOR(ADDR_WIDTH - 1 downto 0);
+	signal mostrar_disp  : STD_LOGIC;
 
 begin 
 
@@ -74,12 +75,18 @@ begin
 					data_out => cable_bus_ram
 					);
 					
-		U5_DECODIFICADOR_DISPLAY : HEX_7seg1
-			PORT MAP(
-					dato_ram => cable_bus_ram,
-					hex_out => bcd_7seg1
-					);
-		
-		U6_DECODIFICADOR_DISPLAY : HEX_7seg2
-			PORT MAP(
-					)
+		process(mostrar_disp, cable_bus_ram)
+			begin
+				if mostrar_disp = '1' then
+					hex_7seg1 <= hex_7seg(cable_bus_ram(3 downto 0));
+					hex_7seg2 <= hex_7seg(cable_bus_ram(7 downto 4));
+					hex_7seg3 <= hex_7seg(cable_bus_ram(11 downto 8));
+					hex_7seg4 <= hex_7seg(cable_bus_ram(15 downto 12));
+				else
+					hex_7seg1 <= "1111111";
+					hex_7seg2 <= "1111111";
+					hex_7seg3 <= "1111111";
+					hex_7seg4 <= "1111111";
+				end if;
+		end process;
+end architecture;
