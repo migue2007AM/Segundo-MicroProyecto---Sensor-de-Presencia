@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 
 entity rom_sync is
   generic (
-    DATA_WIDTH : positive := 8;
+    DATA_WIDTH : positive := 16;
     ADDR_WIDTH : positive := 4
   );
   port (
@@ -17,8 +17,8 @@ end entity;
 architecture rtl of rom_sync is
   type rom_type is array (0 to 2**ADDR_WIDTH-1) of std_logic_vector(DATA_WIDTH-1 downto 0);
   constant mem : rom_type := (
-    0 => x"AA", 1 => x"55", 2 => x"F0", 3 => x"0F",
-    4 => x"FF", 5 => x"00",
+    0 => x"AA55", 1 => x"F00F", 2 => x"1234", 3 => x"ABCD",
+    4 => x"FFFF", 5 => x"0000",
     others => (others => '0')
   );
   signal q_reg : std_logic_vector(DATA_WIDTH-1 downto 0);
