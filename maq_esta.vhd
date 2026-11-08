@@ -10,9 +10,9 @@ entity maq_esta is
         proceso_fin 		  : in  STD_LOGIC; -- senal que indica si el bloque externo terminÃ³
         rom_en            : out STD_LOGIC; -- Habilitador de lectura para ROM
         ram_en            : out STD_LOGIC; -- Habilitador de escritura para RAM 
-        senal			     : out STD_LOGIC;  -- Aviso que la mÃ¡quina de estados envÃ­a
+        senal			     : out STD_LOGIC;  -- Aviso que la máquina de estados envía
 		  tick_1s           : in  STD_LOGIC;
-		  rom_addr          : out STD_LOGIC_VECTOR(3 downto 0) --DirecciÃ³n aleatoria para la ROM (0 a 5)
+		  rom_addr          : out STD_LOGIC_VECTOR(3 downto 0) --Dirección aleatoria para la ROM (0 a 5)
     );
 end maq_esta;
 
@@ -21,13 +21,13 @@ architecture contro of maq_esta is
    type state_type is (ST_ESPERA, ST_PROCESO);
    signal current_state, next_state : state_type;
 	
-	-- SeÃ±ales internas para el generador aleatorio (LFSR)
+	-- Señales internas para el generador aleatorio (LFSR)
    signal registro_lfsr : std_logic_vector(7 downto 0) := "10101011";
    signal bit_retroceso : std_logic;
    signal indice_rom    : integer range 0 to 5 := 0;
 	 
 	begin
-	 -- 1. LÃ³gica del LFSR (Corre constantemente a toda velocidad con el reloj de la FPGA)
+	 -- 1. Lógica del LFSR (Corre constantemente a toda velocidad con el reloj de la FPGA)
 	bit_retroceso <= registro_lfsr(7) xor registro_lfsr(5) xor registro_lfsr(4) xor registro_lfsr(3);
 
 		 process(clk, rst)
