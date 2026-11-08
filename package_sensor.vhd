@@ -4,7 +4,8 @@ USE IEEE.STD_LOGIC_ARITH.ALL;
 USE IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 package package_sensor is
-
+	function hex_7seg(hex : STD_LOGIC_VECTOR(3 downto 0)) return STD_LOGIC_VECTOR;
+	
 	COMPONENT rom_sync IS
 		GENERIC (
 		 DATA_WIDTH : positive := 8;
@@ -21,14 +22,14 @@ package package_sensor is
 	COMPONENT ram_sincrona IS
 		PORT(
 			DATA_WIDTH : positive := 8;
-		ADDR_WIDTH : positive := 4;
-		RDW_MODE   : string   := "READ_FIRST"
+			ADDR_WIDTH : positive := 4;
+			RDW_MODE   : string   := "READ_FIRST"
 		);
 	END COMPONENT;
 	
 	COMPONENT BCD_7SEG IS
 		PORT(
-			A: in STD_LOGIC_VECTOR(3 downto 0);       -- La entrada de 4 bits que el codigo convertira a 7 segmentos para poder plasmarlo en el display
+			A: in STD_LOGIC_VECTOR(3 downto 0);       -- La entrada de 4 bits que el codigo convertira a 7 B para poder plasmarlo en el display
 			B: out STD_LOGIC_VECTOR(6 downto 0)
 		  );
 		 
@@ -80,3 +81,32 @@ package package_sensor is
 		END COMPONENT;
 		
 END package_sensor;
+
+package body package_sensor IS
+	
+	function hex_7seg(hex : STD_LOGIC_VECTOR(3 downto 0)) return STD_LOGIC_VECTOR is
+		variable B : STD_LOGIC_VECTOR(6 downto 0);
+	begin
+		case hex is
+			when x"0" => B := "1000000"; 
+			when x"1" => B := "1111001";
+			when x"2" => B := "0100100";
+			when x"3" => B := "0110000";
+			when x"4" => B := "0011001";
+			when x"5" => B := "0010010";
+			when x"6" => B := "0000010";
+			when x"7" => B := "1111000";
+			when x"8" => B := "0000000";
+			when x"9" => B := "0010000";
+			when x"A" => B := "0001000";
+			when x"B" => B := "0000011";
+			when x"C" => B := "1000110";
+			when x"D" => B := "0100001";
+			when x"E" => B := "0000110";
+			when x"F" => B := "0001110";
+			when others => B := "1111111";
+		end case;
+		return B;
+  end function;
+end package body;
+	
