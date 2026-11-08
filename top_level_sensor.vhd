@@ -24,7 +24,10 @@ architecture logica of top_level_sensor is
 	signal cable_bus_rom : STD_LOGIC_VECTOR(DATA_WIDTH - 1 downto 0);
 	signal cable_bus_ram : STD_LOGIC_VECTOR(DATA_WIDTH - 1 downto 0);
 	signal cable_direccion : STD_LOGIC_VECTOR(ADDR_WIDTH - 1 downto 0);
-	signal mostrar_disp  : STD_LOGIC;
+	signal tick_1s_sig  : STD_LOGIC;
+	signal cable_proceso_fin : STD_LOGIC;
+	signal cable_senal : STD_LOGIC;
+	signal retardo_escritura : STD_LOGIC_VECTOR(1 downto 0) := "00";
 
 begin 
 
@@ -33,7 +36,6 @@ begin
 				clk => clk,
 				reset => reset
 				pin_GPIO => pin_GPIO
-				led_out => led_sensor
 				presencia => cable_presencia
 			);
 			
@@ -42,10 +44,12 @@ begin
 				 clk => clk
 				 rst => reset
 				 pir_in => cable_presencia
-				 proceso_fin => cable_bandera_fsm
-				 rom_en => cable_bus_rom
-				 ram_en => cable_bus_ram
-				 senal => )
+				 proceso_fin => cable_proceso_fin,
+				 rom_en => open
+				 ram_en => cable_bandera_fsm
+				 senal => cable_senal,
+				 tick_1s => tick_1s_sig,
+				 rom_addr => cable_direccion)
 				 
 		U3_MEMORIA_ROM : rom_sync
 			generic map(
@@ -68,12 +72,20 @@ begin
 					
 			PORT MAP(
 					clk => clk,
-					rd_en => reset,
+					rd_en => '1',
 					wr_en => cable_bandera_fsm,
 					addr => cable_direccion,
 					data_in => cable_bus_rom,
 					data_out => cable_bus_ram
 					);
+					
+		process(clk)
+		begin
+			if rising_edge(clk) then
+				retardo_escritura <= retardo_escritura(0) & cable_bandera_fsm;
+			end if;
+		end process;
+		cable_proceso_fin <= retardo_escritura(1);
 					
 		process(mostrar_disp, cable_bus_ram)
 			begin
