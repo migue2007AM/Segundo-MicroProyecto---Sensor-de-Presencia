@@ -7,7 +7,7 @@ entity maq_esta is
         clk               : in  STD_LOGIC;
         rst               : in  STD_LOGIC;
         pir_in            : in  STD_LOGIC; -- '1' hay presencia, '0' no hay
-        proceso_fin 		  : in  STD_LOGIC; -- senal que indica si el bloque externo terminó
+        proceso_fin 		  : in  STD_LOGIC; -- senal que indica si el bloque externo terminÃ³
         rom_en            : out STD_LOGIC; -- Habilitador de lectura para ROM
         ram_en            : out STD_LOGIC; -- Habilitador de escritura para RAM 
         senal			     : out STD_LOGIC;  -- Aviso que la máquina de estados envía
@@ -81,7 +81,7 @@ architecture contro of maq_esta is
 				next_state <= ST_ESPERA;
 			end if;
 		
-	-- ESTADO 1: Bucle de ejecución coordinando las memorias externas
+	-- ESTADO 1: Bucle de ejecuciÃ³n coordinando las memorias externas
 	
 		when ST_PROCESO =>
 			rom_en <= '1';
@@ -105,10 +105,5 @@ architecture contro of maq_esta is
 		end case;
 	end process;
 
-end architecture;
-
-	
-			
-			
-	
+end architecture;	
 	

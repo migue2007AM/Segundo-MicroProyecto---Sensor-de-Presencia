@@ -10,13 +10,15 @@ ENTITY top_level_sensor is
 		reset : in STD_LOGIC;
 		pin_GPIO : IN STD_LOGIC;
 		
+		led_clk   : out STD_LOGIC;
 		led_sensor: out STD_LOGIC;
-		bcd_7seg1 : out STD_LOGIC_VECTOR(6 downto 0);
-		bcd_7seg2 : out STD_LOGIC_VECTOR(6 downto 0);
-		bcd_7seg3 : out STD_LOGIC_VECTOR(6 downto 0);
-		bcd_7seg4 : out STD_LOGIC_VECTOR(6 downto 0)
+		hex_7seg1 : out STD_LOGIC_VECTOR(6 downto 0);
+		hex_7seg2 : out STD_LOGIC_VECTOR(6 downto 0);
+		hex_7seg3 : out STD_LOGIC_VECTOR(6 downto 0);
+		hex_7seg4 : out STD_LOGIC_VECTOR(6 downto 0)
 		);
-		
+end entity;
+
 architecture logica of top_level_sensor is
 
 	signal cable_presencia : STD_LOGIC;
@@ -24,31 +26,48 @@ architecture logica of top_level_sensor is
 	signal cable_bus_rom : STD_LOGIC_VECTOR(DATA_WIDTH - 1 downto 0);
 	signal cable_bus_ram : STD_LOGIC_VECTOR(DATA_WIDTH - 1 downto 0);
 	signal cable_direccion : STD_LOGIC_VECTOR(ADDR_WIDTH - 1 downto 0);
+	signal tick_1s_sig  : STD_LOGIC;
+	signal cable_proceso_fin : STD_LOGIC;
+	signal cable_senal : STD_LOGIC;
+	signal retardo_escritura : STD_LOGIC_VECTOR(1 downto 0) := "00";
 
 begin 
+
+		U5_DIVISOR_FRECUENCIA : divisor_frecuencia
+			generic map(
+						FININ => 50000000,
+						FOUT => 1
+						)
+			PORT MAP(
+					clk_in => clk,
+					reset => reset,
+					clk_out => tick_1s_sig
+					);
 
 		U1_CONTROLADOR_PIR : controlador_HCSR501
 			port map(
 				clk => clk,
-				reset => reset
-				pin_GPIO => pin_GPIO
-				led_out => led_sensor
+				reset => reset,
+				pin_GPIO => pin_GPIO,
 				presencia => cable_presencia
 			);
 			
 		U2_UNIDAD_DE_CONTROL_FSM : maq_esta
 			port map(
-				 clk => clk
-				 rst => reset
-				 pir_in => cable_presencia
-				 proceso_fin => cable_bandera_fsm
-				 rom_en => cable_bus_rom
-				 ram_en => cable_bus_ram
-				 senal => )
+				 clk => clk,
+				 rst => reset,
+				 pir_in => cable_presencia,
+				 proceso_fin => cable_proceso_fin,
+				 rom_en => open,
+				 ram_en => cable_bandera_fsm,
+				 senal => cable_senal,
+				 tick_1s => tick_1s_sig,
+				 rom_addr => cable_direccion
+				 );
 				 
 		U3_MEMORIA_ROM : rom_sync
 			generic map(
-					DATA_WIDTH => 8,
+					DATA_WIDTH => 16,
 					ADDR_WIDTH => 4
 					)
 					
@@ -60,21 +79,42 @@ begin
 					
 		U4_MEMORIA_RAM : ram_sincrona
 			generic map(
-					DATA_WIDTH => 8,
+					DATA_WIDTH => 16,
 					ADDR_WIDTH => 4,
 					RDW_MODE => "READ_FIRST"
 					)
 					
 			PORT MAP(
 					clk => clk,
-					rd_en => reset
-					wr_en => cable_bandera_fsm
-					addr => cable_direccion
-					data_in => cable_bus_rom
+					rd_en => '1',
+					wr_en => cable_bandera_fsm,
+					addr => cable_direccion,
+					data_in => cable_bus_rom,
 					data_out => cable_bus_ram
 					);
 					
-		U5_DECODIFICADOR_DISPLAY : BCD_7seg1
-			PORT MAP(
-					)
-			
+		process(clk)
+		begin
+			if rising_edge(clk) then
+				retardo_escritura <= retardo_escritura(0) & cable_bandera_fsm;
+			end if;
+		end process;
+		cable_proceso_fin <= retardo_escritura(1);
+					
+		process(cable_bandera_fsm, cable_bus_ram)
+			begin
+				if cable_bandera_fsm = '1' then
+					hex_7seg1 <= hex_7seg(cable_bus_ram(3 downto 0));
+					hex_7seg2 <= hex_7seg(cable_bus_ram(7 downto 4));
+					hex_7seg3 <= hex_7seg(cable_bus_ram(11 downto 8));
+					hex_7seg4 <= hex_7seg(cable_bus_ram(15 downto 12));
+				else
+					hex_7seg1 <= "1111111";
+					hex_7seg2 <= "1111111";
+					hex_7seg3 <= "1111111";
+					hex_7seg4 <= "1111111";
+				end if;
+		end process;
+		led_sensor <= cable_presencia;
+		led_clk <= tick_1s_sig;
+end logica;

@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 
 entity ram_sincrona is
   generic (
-    DATA_WIDTH : positive := 8;
+    DATA_WIDTH : positive := 16;
     ADDR_WIDTH : positive := 4;
     RDW_MODE   : string   := "READ_FIRST"  -- "READ_FIRST" | "WRITE_FIRST" | "NO_CHANGE"
   );
