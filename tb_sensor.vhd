@@ -23,6 +23,8 @@ END ENTITY;
 
     -- Período del reloj principal (20 ns -> 50 MHz)
     constant CLK_PERIOD : time := 20 ns;
+	 
+	 Begin
 
 	 -- Instanciación del Top-Level sobrescribiendo el divisor de frecuencia
     uut: ENTITY work.top_level_sensor
