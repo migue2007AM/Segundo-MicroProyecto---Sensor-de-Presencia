@@ -48,7 +48,7 @@ package package_sensor is
 			rom_en            : out STD_LOGIC; -- Habilitador de lectura para ROM
 			ram_en            : out STD_LOGIC; -- Habilitador de escritura para RAM 
 			senal			     : out STD_LOGIC;  -- Aviso que la mÃ¡quina de estados envÃ­a
-			tick_1s           : in  STD_LOGIC;
+			--tick_1s           : in  STD_LOGIC;
 			rom_addr          : out STD_LOGIC_VECTOR(3 downto 0) --DirecciÃ³n aleatoria para la ROM (0 a 5)
 			);
 	 END COMPONENT;
