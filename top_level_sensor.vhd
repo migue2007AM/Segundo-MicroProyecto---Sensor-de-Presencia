@@ -12,10 +12,10 @@ ENTITY top_level_sensor is
 		
 		led_clk   : out STD_LOGIC;
 		led_sensor: out STD_LOGIC;
-		hex_7seg1 : out STD_LOGIC_VECTOR(6 downto 0);
-		hex_7seg2 : out STD_LOGIC_VECTOR(6 downto 0);
-		hex_7seg3 : out STD_LOGIC_VECTOR(6 downto 0);
-		hex_7seg4 : out STD_LOGIC_VECTOR(6 downto 0)
+		hex_7seg1 : out STD_LOGIC_VECTOR(6 to 0);
+		hex_7seg2 : out STD_LOGIC_VECTOR(6 to 0);
+		hex_7seg3 : out STD_LOGIC_VECTOR(6 to 0);
+		hex_7seg4 : out STD_LOGIC_VECTOR(6 to 0)
 		);
 end entity;
 
@@ -61,7 +61,7 @@ begin
 				 rom_en => open,
 				 ram_en => cable_bandera_fsm,
 				 senal => cable_senal,
-				 tick_1s => tick_1s_sig,
+				 --tick_1s => tick_1s_sig,
 				 rom_addr => cable_direccion
 				 );
 				 
@@ -87,7 +87,7 @@ begin
 			PORT MAP(
 					clk => clk,
 					rd_en => '1',
-					wr_en => cable_bandera_fsm,
+					wr_en => retardo_escritura(0),
 					addr => cable_direccion,
 					data_in => cable_bus_rom,
 					data_out => cable_bus_ram
@@ -101,9 +101,9 @@ begin
 		end process;
 		cable_proceso_fin <= retardo_escritura(1);
 					
-		process(cable_bandera_fsm, cable_bus_ram)
+		process(cable_presencia, cable_bus_ram)
 			begin
-				if cable_bandera_fsm = '1' then
+				if cable_presencia = '1' then
 					hex_7seg1 <= hex_7seg(cable_bus_ram(3 downto 0));
 					hex_7seg2 <= hex_7seg(cable_bus_ram(7 downto 4));
 					hex_7seg3 <= hex_7seg(cable_bus_ram(11 downto 8));
@@ -115,6 +115,7 @@ begin
 					hex_7seg4 <= "1111111";
 				end if;
 		end process;
-		led_sensor <= cable_presencia;
+		led_sensor <= pin_GPIO;
 		led_clk <= tick_1s_sig;
+		
 end logica;
