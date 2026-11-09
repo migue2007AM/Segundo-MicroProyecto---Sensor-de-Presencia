@@ -12,10 +12,10 @@ ENTITY top_level_sensor is
 		
 		led_clk   : out STD_LOGIC;
 		led_sensor: out STD_LOGIC;
-		hex_7seg1 : out STD_LOGIC_VECTOR(6 to 0);
-		hex_7seg2 : out STD_LOGIC_VECTOR(6 to 0);
-		hex_7seg3 : out STD_LOGIC_VECTOR(6 to 0);
-		hex_7seg4 : out STD_LOGIC_VECTOR(6 to 0)
+		hex_7seg1 : out STD_LOGIC_VECTOR(6 downto 0);
+		hex_7seg2 : out STD_LOGIC_VECTOR(6 downto 0);
+		hex_7seg3 : out STD_LOGIC_VECTOR(6 downto 0);
+		hex_7seg4 : out STD_LOGIC_VECTOR(6 downto 0)
 		);
 end entity;
 
@@ -30,6 +30,7 @@ architecture logica of top_level_sensor is
 	signal cable_proceso_fin : STD_LOGIC;
 	signal cable_senal : STD_LOGIC;
 	signal retardo_escritura : STD_LOGIC_VECTOR(1 downto 0) := "00";
+	signal cable_wr_en_limpio : STD_LOGIC;
 
 begin 
 
@@ -61,7 +62,7 @@ begin
 				 rom_en => open,
 				 ram_en => cable_bandera_fsm,
 				 senal => cable_senal,
-				 --tick_1s => tick_1s_sig,
+				 tick_1s => tick_1s_sig,
 				 rom_addr => cable_direccion
 				 );
 				 
@@ -87,7 +88,7 @@ begin
 			PORT MAP(
 					clk => clk,
 					rd_en => '1',
-					wr_en => retardo_escritura(0),
+					wr_en => cable_wr_en_limpio,
 					addr => cable_direccion,
 					data_in => cable_bus_rom,
 					data_out => cable_bus_ram
@@ -99,6 +100,8 @@ begin
 				retardo_escritura <= retardo_escritura(0) & cable_bandera_fsm;
 			end if;
 		end process;
+		cable_wr_en_limpio <= '1' when retardo_escritura(0) = '1' and retardo_escritura(1) = '0' else '0';
+		
 		cable_proceso_fin <= retardo_escritura(1);
 					
 		process(cable_presencia, cable_bus_ram)
