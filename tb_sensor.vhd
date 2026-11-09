@@ -23,3 +23,17 @@ END ENTITY;
 
     -- Período del reloj principal (20 ns -> 50 MHz)
     constant CLK_PERIOD : time := 20 ns;
+
+	 -- Instanciación del Top-Level sobrescribiendo el divisor de frecuencia
+    uut: ENTITY work.top_level_sensor
+        PORT MAP (
+            clk        => clk,
+            reset      => reset,
+            pin_GPIO   => pin_GPIO,
+            led_clk    => led_clk,
+            led_sensor => led_sensor,
+            hex_7seg1  => hex_7seg1,
+            hex_7seg2  => hex_7seg2,
+            hex_7seg3  => hex_7seg3,
+            hex_7seg4  => hex_7seg4
+        );
