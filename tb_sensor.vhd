@@ -37,3 +37,45 @@ END ENTITY;
             hex_7seg3  => hex_7seg3,
             hex_7seg4  => hex_7seg4
         );
+		  
+    -- Proceso generador de reloj de 50 MHz
+    clk_process : PROCESS
+    BEGIN
+        clk <= '0';
+        WAIT FOR CLK_PERIOD / 2;
+        clk <= '1';
+        WAIT FOR CLK_PERIOD / 2;
+    END PROCESS;
+
+    -- Proceso de estímulos rápidos para la simulación
+    stim_proc: PROCESS
+    BEGIN
+        -- 1. Reset inicial del sistema
+        reset <= '1';
+        pin_GPIO <= '0';
+        WAIT FOR 100 ns;
+        
+        -- Liberar el reset
+        reset <= '0';
+        WAIT FOR 200 ns;
+
+        -- 2. Simular primera detección del sensor PIR (Pin en alto)
+        pin_GPIO <= '1';
+        WAIT FOR 200 ns; 
+        pin_GPIO <= '0';
+        
+        -- Esperar a que la FSM y las memorias completen el ciclo
+        WAIT FOR 600 ns;
+
+        -- 3. Simular segunda detección del sensor PIR
+        pin_GPIO <= '1';
+        WAIT FOR 200 ns;
+        pin_GPIO <= '0';
+        
+        WAIT FOR 600 ns;
+
+        -- Fin de la prueba controlada
+        WAIT;
+    END PROCESS;
+
+END ARCHITECTURE;
