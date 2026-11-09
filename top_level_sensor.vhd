@@ -30,6 +30,7 @@ architecture logica of top_level_sensor is
 	signal cable_proceso_fin : STD_LOGIC;
 	signal cable_senal : STD_LOGIC;
 	signal retardo_escritura : STD_LOGIC_VECTOR(1 downto 0) := "00";
+	signal cable_wr_en_limpio : STD_LOGIC;
 
 begin 
 
@@ -87,7 +88,7 @@ begin
 			PORT MAP(
 					clk => clk,
 					rd_en => '1',
-					wr_en => cable_bandera_fsm,
+					wr_en => cable_wr_en_limpio,
 					addr => cable_direccion,
 					data_in => cable_bus_rom,
 					data_out => cable_bus_ram
@@ -99,11 +100,13 @@ begin
 				retardo_escritura <= retardo_escritura(0) & cable_bandera_fsm;
 			end if;
 		end process;
+		cable_wr_en_limpio <= '1' when retardo_escritura(0) = '1' and retardo_escritura(1) = '0' else '0';
+		
 		cable_proceso_fin <= retardo_escritura(1);
 					
-		process(cable_bandera_fsm, cable_bus_ram)
+		process(cable_presencia, cable_bus_ram)
 			begin
-				if cable_bandera_fsm = '1' then
+				if cable_presencia = '1' then
 					hex_7seg1 <= hex_7seg(cable_bus_ram(3 downto 0));
 					hex_7seg2 <= hex_7seg(cable_bus_ram(7 downto 4));
 					hex_7seg3 <= hex_7seg(cable_bus_ram(11 downto 8));
@@ -115,6 +118,7 @@ begin
 					hex_7seg4 <= "1111111";
 				end if;
 		end process;
-		led_sensor <= cable_presencia;
+		led_sensor <= pin_GPIO;
 		led_clk <= tick_1s_sig;
+		
 end logica;

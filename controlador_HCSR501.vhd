@@ -61,7 +61,7 @@ begin
 			tick_i <= '0';
 		elsif rising_edge(clk) then
 			if cnt = (cnt_max - 1) then
-				cnt_max <= 0;
+				cnt <= 0;
 				tick_i <= '1';
 			else
 				cnt <= cnt + 1;
@@ -126,21 +126,21 @@ begin
 	
 	process(clk, reset)
 	begin
-		if reset = '0' then
+		if reset = '1' then
 			state <= IDLE;
 		elsif rising_edge(clk) then
 			state <= state_next;
 		end if;
 	end process;
 	
-	process(state, tick)
+	process(state, tick, pin_GPIO)
 	begin
 	state_next <= state;
 	
 		case state is
 			when IDLE =>
 			
-				if tick = '1' and pin_GPIO = '1' then
+				if pin_GPIO = '1' then
 					state_next <= READ_SENSOR;
 				end if;
 				
@@ -164,6 +164,8 @@ begin
 		elsif rising_edge(clk) then
 			if state = READ_SENSOR then
 				led_reg <= pin_GPIO;
+			elsif state = IDLE then
+				led_reg <= '0';
 			else 
 				led_reg <= led_reg;
 			end if;
