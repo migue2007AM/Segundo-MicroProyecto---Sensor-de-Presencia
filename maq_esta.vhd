@@ -7,12 +7,15 @@ entity maq_esta is
         clk               : in  STD_LOGIC;
         rst               : in  STD_LOGIC;
         pir_in            : in  STD_LOGIC; -- '1' hay presencia, '0' no hay
-        proceso_fin 		  : in  STD_LOGIC; -- senal que indica si el bloque externo terminÃ³
+        proceso_fin 		  : in  STD_LOGIC; -- senal que indica si el bloque externo termina³
         rom_en            : out STD_LOGIC; -- Habilitador de lectura para ROM
         ram_en            : out STD_LOGIC; -- Habilitador de escritura para RAM 
-        senal			     : out STD_LOGIC;  -- Aviso que la mÃ¡quina de estados envÃ­a
+        senal			     : out STD_LOGIC;  -- Aviso que la maquina de estados envi­a
 		  --tick_1s           : in  STD_LOGIC;
-		  rom_addr          : out STD_LOGIC_VECTOR(3 downto 0) --DirecciÃ³n aleatoria para la ROM (0 a 5)
+		  rom_addr          : out STD_LOGIC_VECTOR(3 downto 0) --Direccion aleatoria para la ROM (0 a 5)
+        senal			     : out STD_LOGIC;  -- Aviso que la maquina de estados envi­a
+		  tick_1s           : in  STD_LOGIC;
+		  rom_addr          : out STD_LOGIC_VECTOR(3 downto 0) --Direccion aleatoria para la ROM (0 a 5)
     );
 end maq_esta;
 
@@ -42,7 +45,7 @@ architecture contro of maq_esta is
        --end if;
    --end process;
    
-   -- pulso_1s valdrá '1' durante EXACTAMENTE 1 ciclo de reloj cada 1 segundo
+   -- pulso_1s valdrÃ¡ '1' durante EXACTAMENTE 1 ciclo de reloj cada 1 segundo
    --pulso_1s <= '1' when (tick_1s = '1' and tick_1s_prev = '0') else '0';
 	
 		 process(clk, rst)
@@ -107,7 +110,7 @@ architecture contro of maq_esta is
 				next_state <= ST_ESPERA;
 			end if;
 		
-	-- ESTADO 1: Bucle de ejecuciÃ³n coordinando las memorias externas
+	-- ESTADO 1: Bucle de ejecuciÃƒÂ³n coordinando las memorias externas
 	
 		when ST_PROCESO =>
 			rom_en <= '1';
