@@ -62,16 +62,12 @@ architecture contro of maq_esta is
             indice_rom <= 0;
         elsif rising_edge(clk) then
             if pulso_disparo = '1' and current_state = ST_ESPERA then
-					 -- and tick_1s = '1'
                 -- Limita el valor aleatorio estrictamente entre 0 y 5 (mensajes de tu ROM)
-                --indice_rom <= to_integer(unsigned(registro_lfsr)) mod 6;
 					 if to_integer(unsigned(registro_lfsr(2 downto 0))) > 5 then
 							indice_rom <= 5;
 					 else 
 							indice_rom <= to_integer(unsigned(registro_lfsr(2 downto 0)));
 					 end if;
-            --elsif current_state = ST_ESPERA then
-            --    indice_rom <= 0; -- Se reinicia al esperar
             end if;
         end if;
     end process;
@@ -99,13 +95,10 @@ architecture contro of maq_esta is
 	-- ESTADO 0: Espera de presencia del sensor
 		when ST_ESPERA => 
 			rom_en <= '0';
-			--ram_en <= '0';
 			
 			if pulso_disparo = '1' then 
-				--ram_en <= '1';
 				next_state <= ST_PROCESO;
 			else 
-				--ram_en <= '0';
 				next_state <= ST_ESPERA;
 			end if;
 		
@@ -119,28 +112,8 @@ architecture contro of maq_esta is
 				senal <= '1';
 				next_state <= ST_ESPERA;
 			else
-				--ram_en <= '0';
 				next_state <= ST_PROCESO;
 			end if;	
-			
-			--if pir_in = '0' then
-				--senal <= '1';
-				--next_state <= ST_ESPERA;
-			--else 
-				--next_state <= ST_PROCESO;
-			--end if;
-
-			--if (proceso_fin = '1') and (pir_in = '0') then
-				--senal <= '1';
-				--next_state <= ST_ESPERA;
-			
-			--elsif (proceso_fin = '1') and (pir_in= '1') then 
-				--senal <= '1';	
-				--next_state <= ST_PROCESO;
-			
-			--else 
-				--next_state <= ST_PROCESO;
-			--end if;
 			
 			when others => 
 			next_state <= ST_ESPERA;
