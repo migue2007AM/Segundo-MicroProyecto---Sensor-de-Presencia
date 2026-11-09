@@ -73,7 +73,6 @@ package package_sensor is
 			reset : in STD_LOGIC;
 			pin_GPIO : in STD_LOGIC;
 		  
---			led_out : out STD_LOGIC;
 			presencia : out STD_LOGIC);
 			
 		END COMPONENT;
