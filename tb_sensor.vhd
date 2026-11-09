@@ -13,4 +13,13 @@ END ENTITY;
     signal reset    : STD_LOGIC := '1';
     signal pin_GPIO : STD_LOGIC := '0';
 
-    
+    -- Señales de observación
+    signal led_clk    : STD_LOGIC;
+    signal led_sensor : STD_LOGIC;
+    signal hex_7seg1  : STD_LOGIC_VECTOR(6 downto 0);
+    signal hex_7seg2  : STD_LOGIC_VECTOR(6 downto 0);
+    signal hex_7seg3  : STD_LOGIC_VECTOR(6 downto 0);
+    signal hex_7seg4  : STD_LOGIC_VECTOR(6 downto 0);
+
+    -- Período del reloj principal (20 ns -> 50 MHz)
+    constant CLK_PERIOD : time := 20 ns;
