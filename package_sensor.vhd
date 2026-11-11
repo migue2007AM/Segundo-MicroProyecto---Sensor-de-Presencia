@@ -1,7 +1,7 @@
 LIBRARY IEEE;
 USE IEEE.STD_LOGIC_1164.ALL;
-USE IEEE.STD_LOGIC_ARITH.ALL;
-USE IEEE.STD_LOGIC_UNSIGNED.ALL;
+--USE IEEE.STD_LOGIC_ARITH.ALL;
+--USE IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 package package_sensor is
 	constant DATA_WIDTH : positive := 16;
@@ -81,6 +81,7 @@ END package_sensor;
 
 package body package_sensor IS
 	
+	-- Funcion encargada de pasar los numeros hexadecimales a 7 segmentos para que se pueda ver en los displays de la FPGA
 	function hex_7seg(hex : STD_LOGIC_VECTOR(3 downto 0)) return STD_LOGIC_VECTOR is
 		variable B : STD_LOGIC_VECTOR(6 downto 0);
 	begin
